@@ -26,9 +26,9 @@ cd Proj_raizesnordeste_ru4674539
 
 ### 2. Configurar o Ambiente Virtual (venv):
 python -m venv venv
-# No Windows para ativar:
+### No Windows para ativar:
 .\venv\Scripts\activate
-# No Linux/Mac para ativar:
+### No Linux/Mac para ativar:
 source venv/bin/activate
 
 ### 3. Instalar as Dependências:
