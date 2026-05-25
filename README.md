@@ -97,3 +97,63 @@ A organização dos arquivos reflete a divisão estrita de responsabilidades pro
 ├── README.md
 └── requirements.txt
 ```
+
+## 🚀 Endpoints da API e Regras de Negócio Implementadas
+
+A API foi projetada seguindo as especificações do estudo de caso, garantindo contratos de dados rígidos (JSON), validações de segurança e tratamento de erros integrados.
+
+### 1. Registro de Pedidos e Fidelização Automática (RF03)
+* **Rota:** `POST /api/pedidos/`
+* **Descrição:** Recebe a requisição dos canais de venda (ex: Totem). O preço não é enviado pelo cliente para evitar fraudes; o back-end busca o valor real no banco de dados, calcula o montante total da venda de forma atômica e atualiza instantaneamente o saldo de fidelidade do cliente cadastrado (R$ 1,00 gasto = 1 ponto acumulado).
+
+**Exemplo de Payload Enviado (Front-end):**
+```json
+{
+    "id_cliente": 1,
+    "id_filial": 2,
+    "canal_venda": "Totem",
+    "itens": [
+        {
+            "id_produto": 1,
+            "quantidade": 2
+        }
+    ]
+}
+```
+
+### 2. Painel da Cozinha e Leitura Profunda / Nested Reads (RF01)
+* **Rota:** GET /api/pedidos/
+* **Descrição:** Permite que as cozinhas e gerentes listem os pedidos em tempo real. Utiliza serialização profunda com SerializerMethodField para aninhar os detalhes de consumo, exibindo o nome comercial do produto e preço unitário consolidado.
+
+**Exemplo de Payload Enviado (Front-end):**
+```json
+[
+    {
+        "id_pedido": 1,
+        "id_cliente": 1,
+        "id_filial": 2,
+        "canal_venda": "Totem",
+        "itens": [
+            {
+                "id_produto": 1,
+                "nome_produto": "Cuzcuz com ovo",
+                "quantidade": 2,
+                "preco_pago": "12.00"
+            }
+        ],
+        "valor_total": "24.00",
+        "data_pedido": "2026-05-18T19:33:01.997506-03:00"
+    }
+]
+```
+
+🛡️ **Tratamento de Erros e Integridade (RNF04)**
+A API responde sob um contrato previsível. Caso haja envio de chaves estrangeiras inválidas ou dados nulos em campos obrigatórios, o sistema intercepta a operação retornando HTTP 400 Bad Request com o mapeamento exato da falha:
+
+```json
+{
+    "id_cliente": [
+        "Pk inválido \"99\" - objeto não existe."
+    ]
+}
+```
