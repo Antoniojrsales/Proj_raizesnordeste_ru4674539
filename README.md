@@ -147,7 +147,7 @@ A API foi projetada seguindo as especificações do estudo de caso, garantindo c
 ]
 ```
 
-🛡️ **Tratamento de Erros e Integridade (RNF04)**
+### 🛡️ **Tratamento de Erros e Integridade (RNF04)**
 A API responde sob um contrato previsível. Caso haja envio de chaves estrangeiras inválidas ou dados nulos em campos obrigatórios, o sistema intercepta a operação retornando HTTP 400 Bad Request com o mapeamento exato da falha:
 
 ```json

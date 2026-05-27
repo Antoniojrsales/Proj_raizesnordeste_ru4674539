@@ -45,8 +45,16 @@ class PedidoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pedido
-        fields = ['id_pedido', 'id_cliente', 'id_filial', 'canal_venda', 'itens', 'valor_total', 'data_pedido']
-        read_only_fields = ['id_pedido', 'valor_total', 'data_pedido']
+        fields = ['id_pedido', 
+                  'id_cliente', 
+                  'id_filial', 
+                  'canal_venda', 
+                  'itens', 
+                  'valor_total', 
+                  'data_pedido',
+                  'status_pagamento',
+                  'itens']
+        read_only_fields = ['id_pedido', 'valor_total', 'data_pedido', 'status_pagamento']
 
     def get_itens(self, obj):
         """

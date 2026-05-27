@@ -1,0 +1,28 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    {% include 'app_raizesnordeste_ru4674539/partials/head.html' %}
+
+    <title>{% block title %}{% endblock title %} | Raízes do Nordeste</title>
+
+</head>
+<body class="d-flex flex-column min-vh-100">
+    {% include 'app_raizesnordeste_ru4674539/partials/navbar.html' %}
+
+    <div class="main-content-container" style="min-height: 80vh;">
+        {% block main-content %}{% endblock main-content %}
+    </div>
+
+    <footer class="bg-dark text-white-50 text-center py-3 mt-auto border-top border-secondary">
+        {% include 'app_raizesnordeste_ru4674539/partials/footer.html' %}
+    </footer>
+
+    <script src="{% static 'app_raizesnordeste_ru4674539/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {% block scripts %}{% endblock scripts %}
+
+</body>
+</html>
