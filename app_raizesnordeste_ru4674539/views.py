@@ -76,3 +76,12 @@ class PedidoPagamentoMockAPIView(APIView):
                 "status_pagamento": pedido.status_pagamento,
                 "message": "Pagamento recusado pela operadora simulada."
             }, status=status.HTTP_200_OK)
+        
+class TotemView(View):
+    def get(self, request):
+        produtos = Produto.objects.all()
+
+        context = {
+            'produtos': produtos
+        }
+        return render(request, 'app_raizesnordeste_ru4674539/pages/totem.html', context)

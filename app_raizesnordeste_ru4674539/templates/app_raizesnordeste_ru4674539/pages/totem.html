@@ -1,0 +1,135 @@
+{% extends 'global/base.html' %}
+{% load static %}
+
+{% block title %}Totem de Autoatendimento - Raízes do Nordeste{% endblock %}
+
+{% block main-content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-dark">🌵 Cardápio do Nordeste</h2>
+            <span class="badge bg-danger fs-6">Unidade: Barra do Ceará</span>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for produto in produtos %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60" class="card-img-top" alt="{{ produto.nome }}" style="height: 180px; object-fit: cover;">
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold text-dark mb-1">{{ produto.nome_produto }}</h5>
+                        <p class="card-text text-muted small flex-grow-1">{{ produto.descricao|default:"Delicioso prato típico preparado com ingredientes selecionados da nossa terra." }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="fs-5 fw-bold text-danger">R$ {{ produto.preco_unitario|floatformat:2 }}</span>
+                            <button class="btn btn-dark btn-sm rounded-pill px-3 shadow-sm btn-adicionar"
+                                    data-id="{{ produto.id }}" 
+                                    data-nome="{{ produto.nome_produto }}" 
+                                    data-preco="{{ produto.preco_unitario }}">
+                                ➕ Adicionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted fs-5">Nenhum produto cadastrado no banco de dados ainda.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 rounded-3 p-4 bg-white sticky-top" style="top: 20px;">
+            <h4 class="fw-bold text-dark mb-3">🛒 Meu Carrinho</h4>
+            <hr>
+            
+            <div id="carrinho-itens">
+                <p class="text-muted text-center py-4 small">O carrinho está vazio.<br>Selecione os produtos ao lado.</p>
+            </div>
+
+            <hr class="my-3">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <span class="fw-bold text-muted">Total:</span>
+                <span class="fs-4 fw-bold text-dark" id="carrinho-total">R$ 0,00</span>
+            </div>
+
+            <button id="btn-finalizar" class="btn btn-danger btn-lg w-100 rounded-3 shadow-sm fw-bold disabled">
+                Confirmar e Ir para o Pagamento
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock main-content %}
+
+{% block scripts %}
+<script>
+    // Memória temporária do carrinho no navegador
+    let carrinho = [];
+
+    // Captura os elementos da tela
+    const botoesAdicionar = document.querySelectorAll('.btn-adicionar');
+    const containerItens = document.getElementById('carrinho-itens');
+    const elementoTotal = document.getElementById('carrinho-total');
+    const btnFinalizar = document.getElementById('btn-finalizar');
+
+    // Escuta o clique em cada botão do cardápio
+    botoesAdicionar.forEach(botao => {
+        botao.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const nome = this.getAttribute('data-nome');
+            const preco = parseFloat(this.getAttribute('data-preco'));
+
+            // Verifica se o item já está no carrinho
+            const itemExistente = carrinho.find(item => item.id === id);
+
+            if (itemExistente) {
+                itemExistente.quantidade += 1;
+            } else {
+                carrinho.push({ id, nome, preco, quantidade: 1 });
+            }
+
+            atualizarInterfaceCarrinho();
+        });
+    });
+
+    // Função que redesenha o carrinho na lateral e calcula o valor
+    function atualizarInterfaceCarrinho() {
+        if (carrinho.length === 0) {
+            containerItens.innerHTML = '<p class="text-muted text-center py-4 small">O carrinho está vazio.<br>Selecione os produtos ao lado.</p>';
+            elementoTotal.innerText = 'R$ 0,00';
+            btnFinalizar.classList.add('disabled');
+            return;
+        }
+
+        // Limpa o container para renderizar os itens atuais
+        containerItens.innerHTML = '';
+        let totalGeral = 0;
+
+        carrinho.forEach(item => {
+            const totalItem = item.preco * item.quantidade;
+            totalGeral += totalItem;
+
+            // Cria a linha do produto no carrinho de forma elegante com Bootstrap
+            const divItem = document.createElement('div');
+            divItem.className = 'd-flex justify-content-between align-items-center mb-2 border-bottom pb-2';
+            divItem.innerHTML = `
+                <div>
+                    <span class="fw-bold text-dark small">${item.nome}</span><br>
+                    <small class="text-muted">${item.quantidade}x R$ ${item.preco.toFixed(2)}</small>
+                </div>
+                <span class="fw-bold text-danger small">R$ ${totalItem.toFixed(2)}</span>
+            `;
+            containerItens.appendChild(divItem);
+        });
+
+        // Atualiza o valor total na tela
+        elementoTotal.innerText = `R$ ${totalGeral.toFixed(2)}`;
+
+        // Ativa o botão de confirmação mudando o status visual
+        btnFinalizar.classList.remove('disabled');
+    }
+</script>
+{% endblock scripts %}
