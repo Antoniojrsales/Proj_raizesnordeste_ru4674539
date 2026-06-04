@@ -1,30 +1,61 @@
 {% extends 'global/base.html' %}
+
+{# Carrega o módulo de arquivos estáticos do Django para mapear CSS, JS e Imagens locais #}
 {% load static %}
 
+{# Bloco do título específico de cada página mantendo o sufixo #}
 {% block title %}Totem de Autoatendimento - Raízes do Nordeste{% endblock %}
 
 {% block main-content %}
 <div class="row">
+    <!-- CONTEINER PRINCIPAL DO CARDÁPIO (ESQUERDA)-->
     <div class="col-md-8">
+        <!-- Cabeçalho de contexto da unidade -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold text-dark">🌵 Cardápio do Nordeste</h2>
             <span class="badge bg-danger fs-6">Unidade: Barra do Ceará</span>
         </div>
 
+        <!-- Barra de Busca: Elemento de captura para filtragem via JavaScript -->
+        <div class="mb-4">
+            <div class="input-group shadow-sm rounded-3 overflow-hidden">
+                <span class="input-group-text bg-white border-0 text-muted">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <!-- O input aguarda a busca pelo usuario do eventos 'input' do JS -->
+                <input type="text" id="busca-produto" class="form-control border-0 py-2" placeholder="Digite para buscar um prato ou bebida... (ex: Cuzcuz)">
+            </div>
+        </div>
+
+        <!-- Grid Responsivo de Produtos -->
         <div class="row row-cols-1 row-cols-md-2 g-4">
+            
+            {# LOOP DJANGO: Itera sobre a coleção dos 'produtos' enviada pela View #}
             {% for produto in produtos %}
-            <div class="col">
+            
+            <div class="col card-produto-item" data-nome-busca="{{ produto.nome_produto|lower }}">
                 <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60" class="card-img-top" alt="{{ produto.nome }}" style="height: 180px; object-fit: cover;">
+                    
+                    <!-- Imagem do Produto -->
+                    <img src="" class="card-img-top img-produto-card" 
+                                data-produto-nome="{{ produto.nome_produto|lower }}" 
+                                alt="{{ produto.nome_produto }}" 
+                                style="height: 180px; object-fit: cover;">
                     
                     <div class="card-body d-flex flex-column">
+                        <!-- Nome do produto vindo diretamente da coluna do banco de dados -->
                         <h5 class="card-title fw-bold text-dark mb-1">{{ produto.nome_produto }}</h5>
+                        
+                        <!-- Descrição do produto se estiver vazia assume o texto padrão -->
                         <p class="card-text text-muted small flex-grow-1">{{ produto.descricao|default:"Delicioso prato típico preparado com ingredientes selecionados da nossa terra." }}</p>
                         
                         <div class="d-flex justify-content-between align-items-center mt-3">
+                            <!-- Formatação de Moeda: padrão Real (R$) -->
                             <span class="fs-5 fw-bold text-danger">R$ {{ produto.preco_unitario|floatformat:2 }}</span>
+                            
+                            <!-- Botão de Evento de Compra -->
                             <button class="btn btn-dark btn-sm rounded-pill px-3 shadow-sm btn-adicionar"
-                                    data-id="{{ produto.id }}" 
+                                    data-id="{{ produto.id_produto }}" 
                                     data-nome="{{ produto.nome_produto }}" 
                                     data-preco="{{ produto.preco_unitario }}">
                                 ➕ Adicionar
@@ -33,29 +64,39 @@
                     </div>
                 </div>
             </div>
+            
+            {# Msg de Produto Não Encontrado #}
             {% empty %}
             <div class="col-12 text-center py-5">
                 <p class="text-muted fs-5">Nenhum produto cadastrado no banco de dados ainda.</p>
             </div>
             {% endfor %}
+            
         </div>
     </div>
 
+    <!-- CONTEINER SECUNDÁRIO (DIREITA): PAINEL LATERAL DO CARRINHO DE COMPRAS-->
     <div class="col-md-4">
+         <!-- Card do Resumo do Carrinho -->
         <div class="card shadow-sm border-0 rounded-3 p-4 bg-white sticky-top" style="top: 20px;">
             <h4 class="fw-bold text-dark mb-3">🛒 Meu Carrinho</h4>
             <hr>
             
             <div id="carrinho-itens">
+                <!-- Estado Inicial Padrão: Apresenta o carrinho se estiver vazio -->
                 <p class="text-muted text-center py-4 small">O carrinho está vazio.<br>Selecione os produtos ao lado.</p>
             </div>
 
             <hr class="my-3">
+            
+            <!-- Bloco de Faturamento Global -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <span class="fw-bold text-muted">Total:</span>
+                <!-- ID carrinho-total: Mostra o valor total formatado -->
                 <span class="fs-4 fw-bold text-dark" id="carrinho-total">R$ 0,00</span>
             </div>
 
+            <!-- Botão confirmar pagamento apenas quando houver itens no carrinho -->
             <button id="btn-finalizar" class="btn btn-danger btn-lg w-100 rounded-3 shadow-sm fw-bold disabled">
                 Confirmar e Ir para o Pagamento
             </button>
@@ -66,6 +107,27 @@
 
 {% block scripts %}
 <script>
+
+    // Captura o campo de busca
+    const inputBusca = document.getElementById('busca-produto');
+    const cardsProdutos = document.querySelectorAll('.card-produto-item');
+
+    // Escuta a digitação do usuário
+    inputBusca.addEventListener('input', function() {
+        const termoBusca = this.value.toLowerCase().trim();
+
+        cardsProdutos.forEach(card => {
+            const nomeProduto = card.getAttribute('data-nome-busca');
+            
+            // Se o nome do produto contiver o termo buscado, mostra; senão, esconde
+            if (nomeProduto.includes(termoBusca)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+
     // Memória temporária do carrinho no navegador
     let carrinho = [];
 
@@ -86,11 +148,14 @@
             const itemExistente = carrinho.find(item => item.id === id);
 
             if (itemExistente) {
+            // Se já existir, apenas incrementa a quantidade dele
                 itemExistente.quantidade += 1;
             } else {
+                // Se for um produto novo, adiciona ele como um novo objeto no final da lista
                 carrinho.push({ id, nome, preco, quantidade: 1 });
             }
 
+            // Atualiza a barra lateral redesenhando a tela e recalculando o total
             atualizarInterfaceCarrinho();
         });
     });
@@ -131,5 +196,101 @@
         // Ativa o botão de confirmação mudando o status visual
         btnFinalizar.classList.remove('disabled');
     }
+
+    // Mapeamento de imagens profissionais para o cardápio
+    const imagensProdutos = {
+        'cuzcuz com ovo': '/static/app_raizesnordeste_ru4674539/imagens/cuscuz_ovo.jpg',
+        'pao de queijo': '/static/app_raizesnordeste_ru4674539/imagens/pao_queijo.jpg',
+        'pao na chapa': '/static/app_raizesnordeste_ru4674539/imagens/pao_chapa.jpg',
+        'cafe com leite': '/static/app_raizesnordeste_ru4674539/imagens/cafe_leite.jpg'
+    };
+
+    // Imagem padrão caso o nome digitado no banco seja diferente
+    const imagemPadrao = '/static/app_raizesnordeste_ru4674539/imagens/cafe_leite.jpg';
+
+    // Seleciona todas as imagens da tela e aplica o link correspondente
+    document.querySelectorAll('.img-produto-card').forEach(img => {
+        const nome = img.getAttribute('data-produto-nome');
+        // Se existir o nome no nosso dicionário, usa a foto dele; senão, usa a padrão
+        img.src = imagensProdutos[nome] || imagemPadrao;
+    });
+
+    // Função auxiliar para capturar o CSRF Token dos cookies do navegador
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Escuta o clique no botão "Confirmar e Ir para o Pagamento"
+    btnFinalizar.addEventListener('click', function() {
+        // Se o botão estiver desabilitado, impede o clique
+        if (this.classList.contains('disabled')) return;
+
+        // Desabilita o botão temporariamente para evitar cliques duplos e pedidos duplicados
+        this.classList.add('disabled');
+        this.innerText = "Processando Pedido...";
+
+        // Coleta o token de segurança
+        const csrftoken = getCookie('csrftoken');
+
+        // Dispara a requisição assíncrona para a nova rota do back-end
+        fetch('/totem/criar-pedido/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken  // Injeta o token de segurança no cabeçalho
+            },
+            body: JSON.stringify({
+                itens: carrinho  // Envia o array completo do carrinho para o back-end processar o pedido
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                // Dispara o alerta estético de sucesso
+                Swal.fire({
+                    title: 'Pedido Confirmado! 🎉',
+                    text: `Seu pedido número #${data.pedido_id} foi gerado. Vamos para o pagamento!`,
+                    icon: 'success',
+                    confirmButtonColor: '#dc3545',
+                    confirmButtonText: 'Ir para o Pagamento'
+                }).then((result) => {
+                    // Redireciona o usuário para a tela de mock de pagamento passando o ID do pedido
+                    window.location.href = `/totem/pagamento/${data.pedido_id}/`;
+                });
+            } else {
+                // Tratamento da validação de erro
+                Swal.fire({
+                    title: 'Ops! Algo deu errado',
+                    text: data.erro || 'Não foi possível processar seu pedido.',
+                    icon: 'error',
+                    confirmButtonColor: '#343a40'
+                });
+                btnFinalizar.classList.remove('disabled');
+                btnFinalizar.innerText = "Confirmar e Ir para o Pagamento";
+            }
+        })
+        .catch(error => {
+            console.error('Erro na requisição:', error);
+            Swal.fire({
+                title: 'Erro de Conexão',
+                text: 'Falha ao se comunicar com o servidor. Tente novamente.',
+                icon: 'error',
+                confirmButtonColor: '#343a40'
+            });
+            btnFinalizar.classList.remove('disabled');
+            btnFinalizar.innerText = "Confirmar e Ir para o Pagamento";
+        });
+    });
 </script>
 {% endblock scripts %}

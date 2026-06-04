@@ -1,0 +1,86 @@
+{% extends 'global/base.html' %}
+{% load static %}
+
+{% block title %}Checkout - Raízes do Nordeste{% endblock %}
+
+{% block main-content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-3 overflow-hidden bg-white text-center p-5">
+            
+            <div class="mb-4">
+                <span class="badge bg-danger fs-6 mb-2">Pedido #{{ pedido.id_pedido }}</span>
+                <h2 class="fw-bold text-dark">💳 Tela de Pagamento</h2>
+                <p class="text-muted small">Unidade: Barra do Ceará | Canal: Totem</p>
+            </div>
+
+            <hr>
+
+            <div class="my-4 py-3 bg-light rounded-3">
+                <span class="text-muted fw-bold text-uppercase small d-block mb-1">Total a Pagar</span>
+                <h1 class="fw-bold text-danger mb-0" id="valor-pagamento">R$ {{ pedido.valor_total|floatformat:2 }}</h1>
+            </div>
+
+            <div class="mb-4 text-start">
+                <label class="fw-bold text-dark mb-3"><i class="fa-solid fa-wallet text-muted me-2"></i> Escolha a forma de pagamento:</label>
+                
+                <div class="row g-3">
+                    <div class="col-6">
+                        <button class="btn btn-outline-dark w-100 py-3 rounded-3 fw-bold active" id="opcao-pix">
+                            <i class="fa-solid fa-qrcode fs-3 d-block mb-2"></i> Pix Instantâneo
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-outline-dark w-100 py-3 rounded-3 fw-bold" id="opcao-cartao">
+                            <i class="fa-solid fa-credit-card fs-3 d-block mb-2"></i> Cartão Máquina
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="area-pix" class="my-4 text-center">
+                <div class="p-3 bg-white border rounded-3 d-inline-block shadow-sm mb-2">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=RaizesDoNordestePedido{{ pedido.id_pedido }}" alt="QR Code Pix">
+                </div>
+                <p class="text-muted small"><i class="fa-solid fa-spinner fa-spin me-2"></i> Aguardando aprovação do pagamento pelo banco...</p>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-flex gap-3">
+                <a href="{% url 'totem' %}" class="btn btn-light btn-lg w-50 rounded-3 fw-bold border text-muted">
+                    Cancelar
+                </a>
+                <button id="btn-simular-sucesso" class="btn btn-danger btn-lg w-50 rounded-3 fw-bold shadow-sm">
+                    Simular Sucesso 🎉
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock main-content %}
+
+{% block scripts %}
+<script>
+    // Script básico para interatividade da tela de checkout
+    const btnSucesso = document.getElementById('btn-simular-sucesso');
+
+    btnSucesso.addEventListener('click', function() {
+        this.classList.add('disabled');
+        this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i> Processando...';
+
+        // Dispara o alerta de sucesso final
+        Swal.fire({
+            title: 'Pagamento Aprovado! 🍳',
+            text: 'O seu pedido foi enviado para a cozinha da Raízes do Nordeste. Retire a sua senha!',
+            icon: 'success',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Finalizar e Imprimir Senha'
+        }).then((result) => {
+            // Retorna o totem para o estado inicial pronto para o próximo cliente
+            window.location.href = "{% url 'totem' %}";
+        });
+    });
+</script>
+{% endblock scripts %}

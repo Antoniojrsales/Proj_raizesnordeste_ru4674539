@@ -1,11 +1,19 @@
+{# Componente Estrutural: Barra de Navegação (Navbar) #}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
+    
+    {# Conteiner para alinhar o grid principal do sistema #}
     <div class="container">
+        
+        {# Logotipo de Retorno para a Página Inicial (Home) usando a tag dinâmica do Django {% url 'home' %} #}
         <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
             <i class="fa-solid fa-mug-hot"></i>
             <span class="fw-bold">Raízes do Nordeste</span>
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Menu de Navegação">
+        {# Botão Hamburguer: Aciona o menu em telas menores através do Bootstrap (Acessibilidade e Responsividade) #}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" 
+                aria-label="Menu de Navegação">
             <span class="navbar-toggler-icon"></span>
         </button>
 
