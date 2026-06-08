@@ -1,0 +1,249 @@
+[
+{
+    "model": "app_raizesnordeste_ru4674539.cliente",
+    "pk": 1,
+    "fields": {
+        "nome_completo": "Mariazinha",
+        "cpf": "12345678912",
+        "email": "mariazinha@mariazinha.com",
+        "telefone": "85999999999",
+        "data_nascimento": "2026-05-18",
+        "rua": "logradouro",
+        "numero": "151",
+        "bairro": "logra",
+        "cidade": "Fortaleza",
+        "estado": "CE",
+        "saldo_pontos": 24,
+        "aceite_termos": true,
+        "data_aceite_termos": "2026-05-18T22:30:18.991Z"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.filial",
+    "pk": 2,
+    "fields": {
+        "cidade": "Fortaleza",
+        "estado": "Ceara"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.filial",
+    "pk": 3,
+    "fields": {
+        "cidade": "Fortaleza",
+        "estado": "CE"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.filial",
+    "pk": 4,
+    "fields": {
+        "cidade": "Fortaleza",
+        "estado": "Ceara"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.filial",
+    "pk": 5,
+    "fields": {
+        "cidade": "Fortaleza",
+        "estado": "Ceara"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.categoriaproduto",
+    "pk": 1,
+    "fields": {
+        "nome_categoria": "Café da Manhã"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.produto",
+    "pk": 1,
+    "fields": {
+        "id_categoria": 1,
+        "nome_produto": "Cuzcuz com ovo",
+        "fornecedor": "diversos",
+        "preco_unitario": "12.00",
+        "validade_produto": "2026-05-19",
+        "unidade_medida": "un",
+        "is_sazonal": false,
+        "disponivel": true,
+        "filiais": [
+            2
+        ]
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.produto",
+    "pk": 2,
+    "fields": {
+        "id_categoria": 1,
+        "nome_produto": "Pao de Queijo",
+        "fornecedor": "diversos",
+        "preco_unitario": "4.00",
+        "validade_produto": "2027-06-01",
+        "unidade_medida": "un",
+        "is_sazonal": false,
+        "disponivel": true,
+        "filiais": [
+            2,
+            3
+        ]
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.produto",
+    "pk": 3,
+    "fields": {
+        "id_categoria": 1,
+        "nome_produto": "Pao na Chapa",
+        "fornecedor": "diversos",
+        "preco_unitario": "2.00",
+        "validade_produto": "2027-06-01",
+        "unidade_medida": "un",
+        "is_sazonal": false,
+        "disponivel": true,
+        "filiais": [
+            3,
+            4
+        ]
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.produto",
+    "pk": 4,
+    "fields": {
+        "id_categoria": 1,
+        "nome_produto": "Cafe com Leite",
+        "fornecedor": "diversos",
+        "preco_unitario": "5.00",
+        "validade_produto": "2027-06-01",
+        "unidade_medida": "un",
+        "is_sazonal": false,
+        "disponivel": true,
+        "filiais": [
+            4,
+            5
+        ]
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.pedido",
+    "pk": 1,
+    "fields": {
+        "id_cliente": 1,
+        "id_filial": 2,
+        "canal_venda": "Totem",
+        "valor_total": "24.00",
+        "data_pedido": "2026-05-18T22:33:01.997Z",
+        "status_pagamento": "APROVADO"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.pedido",
+    "pk": 2,
+    "fields": {
+        "id_cliente": 1,
+        "id_filial": 2,
+        "canal_venda": "TOTEM",
+        "valor_total": "9.00",
+        "data_pedido": "2026-06-03T21:38:43.192Z",
+        "status_pagamento": "PENDENTE"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.pedido",
+    "pk": 3,
+    "fields": {
+        "id_cliente": 1,
+        "id_filial": 2,
+        "canal_venda": "TOTEM",
+        "valor_total": "17.00",
+        "data_pedido": "2026-06-04T21:17:28.470Z",
+        "status_pagamento": "PENDENTE"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.pedido",
+    "pk": 4,
+    "fields": {
+        "id_cliente": 1,
+        "id_filial": 2,
+        "canal_venda": "TOTEM",
+        "valor_total": "7.00",
+        "data_pedido": "2026-06-05T22:12:52.862Z",
+        "status_pagamento": "PAGO"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.itenspedido",
+    "pk": 1,
+    "fields": {
+        "id_pedido": 1,
+        "id_produto": 1,
+        "quantidade": 2,
+        "preco_unitario": "12.00"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.itenspedido",
+    "pk": 2,
+    "fields": {
+        "id_pedido": 2,
+        "id_produto": 4,
+        "quantidade": 1,
+        "preco_unitario": "5.00"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.itenspedido",
+    "pk": 3,
+    "fields": {
+        "id_pedido": 2,
+        "id_produto": 2,
+        "quantidade": 1,
+        "preco_unitario": "4.00"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.itenspedido",
+    "pk": 4,
+    "fields": {
+        "id_pedido": 3,
+        "id_produto": 1,
+        "quantidade": 1,
+        "preco_unitario": "12.00"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.itenspedido",
+    "pk": 5,
+    "fields": {
+        "id_pedido": 3,
+        "id_produto": 4,
+        "quantidade": 1,
+        "preco_unitario": "5.00"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.itenspedido",
+    "pk": 6,
+    "fields": {
+        "id_pedido": 4,
+        "id_produto": 4,
+        "quantidade": 1,
+        "preco_unitario": "5.00"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.itenspedido",
+    "pk": 7,
+    "fields": {
+        "id_pedido": 4,
+        "id_produto": 3,
+        "quantidade": 1,
+        "preco_unitario": "2.00"
+    }
+}
+]

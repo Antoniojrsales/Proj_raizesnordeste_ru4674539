@@ -20,7 +20,8 @@ Siga os passos abaixo para clonar o repositório e rodar o back-end na sua máqu
 
 ### 1. Clonar o Repositório:
 ```bash
-git clone https://github.com/Antoniojrsales/Proj_raizesnordeste_ru4674539
+git clone https://github.com/Antoniojrsales/Proj_raizesnordeste_ru4674539.git
+
 cd Proj_raizesnordeste_ru4674539
 ```
 
@@ -36,6 +37,9 @@ pip install -r requirements.txt
 
 ### 4. Executar as Migrações do Banco de Dados (SQLite):
 python manage.py migrate
+
+### 5. Carregar a Massa de Dados Inicial
+python manage.py loaddata dados_iniciais.json
 
 ### 5. Iniciar o Servidor de Desenvolvimento:
 python manage.py runserver

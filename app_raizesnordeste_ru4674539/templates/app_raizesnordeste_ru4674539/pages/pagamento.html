@@ -63,23 +63,87 @@
 
 {% block scripts %}
 <script>
-    // Script básico para interatividade da tela de checkout
+    // Captura o componente de gatilho do sucesso da simulação
     const btnSucesso = document.getElementById('btn-simular-sucesso');
+    // Captura o ID do pedido injetado nativamente pelo contexto do Django Template
+    const pedidoId = "{{ pedido.id_pedido }}";
 
+    /**
+     * Função auxiliar para capturar o CSRF Token dos cookies do navegador.
+     * Obrigatório para transações estritas de mutação de dados (POST) no Django.
+     */
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Escuta o evento de clique para rodar o pipeline de baixa financeira
     btnSucesso.addEventListener('click', function() {
+        // Bloqueia cliques redundantes e altera o estado visual para processamento
         this.classList.add('disabled');
-        this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i> Processando...';
+        this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i> Confirmando no Banco...';
 
-        // Dispara o alerta de sucesso final
-        Swal.fire({
-            title: 'Pagamento Aprovado! 🍳',
-            text: 'O seu pedido foi enviado para a cozinha da Raízes do Nordeste. Retire a sua senha!',
-            icon: 'success',
-            confirmButtonColor: '#dc3545',
-            confirmButtonText: 'Finalizar e Imprimir Senha'
-        }).then((result) => {
-            // Retorna o totem para o estado inicial pronto para o próximo cliente
-            window.location.href = "{% url 'totem' %}";
+        // Coleta a assinatura de segurança do cabeçalho
+        const csrftoken = getCookie('csrftoken');
+
+        // Inicializa a requisição assíncrona em segundo plano para o servidor Django
+        fetch('/totem/confirmar-pagamento/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                pedido_id: pedidoId // Envia a chave primária real do pedido a ser atualizado
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                // Fluxo de Homologação: O pedido está oficialmente marcado como PAGO no MySQL
+                Swal.fire({
+                    title: 'Pagamento Aprovado! 🍳',
+                    text: 'O seu pedido foi enviado para a cozinha da Raízes do Nordeste. Retire a sua senha!',
+                    icon: 'success',
+                    confirmButtonColor: '#dc3545',
+                    confirmButtonText: 'Finalizar e Imprimir Senha'
+                }).then((result) => {
+                    // Limpa o fluxo do cliente atual e reinicia o totem para o próximo pedido
+                    window.location.href = "{% url 'totem' %}";
+                });
+            } else {
+                // Tratamento de Exceções de negócio retornadas do back-end
+                Swal.fire({
+                    title: 'Falha no Pagamento',
+                    text: data.erro || 'Não foi possível confirmar o pagamento.',
+                    icon: 'error',
+                    confirmButtonColor: '#343a40'
+                });
+                // Libera o componente visual para nova tentativa
+                btnSucesso.classList.remove('disabled');
+                btnSucesso.innerHTML = 'Simular Sucesso 🎉';
+            }
+        })
+        .catch(error => {
+            console.error('Erro na requisição de baixa:', error);
+            Swal.fire({
+                title: 'Erro de Comunicação',
+                text: 'Falha ao conectar com o banco de dados da lanchonete.',
+                icon: 'error',
+                confirmButtonColor: '#343a40'
+            });
+            btnSucesso.classList.remove('disabled');
+            btnSucesso.innerHTML = 'Simular Sucesso 🎉';
         });
     });
 </script>

@@ -161,3 +161,28 @@ class PagamentoView(View):
             'pedido': pedido
         }
         return render(request, 'app_raizesnordeste_ru4674539/pages/pagamento.html', context)
+
+class ConfirmarPagamentoView(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            # 1. Converte o JSON enviado pelo botão de sucesso do checkout
+            dados = json.loads(request.body)
+            pedido_id = dados.get('pedido_id')
+
+            if not pedido_id:
+                return JsonResponse({'sucesso': False, 'erro': 'ID do pedido não fornecido.'}, status=400)
+
+            # 2. Busca o pedido específico de forma segura no MySQL
+            pedido = Pedido.objects.get(id_pedido=pedido_id)
+
+            # 3. Transição de Estado: Altera o status para PAGO (Conforme mapeamos no seu model)
+            pedido.status_pagamento = 'PAGO'
+            pedido.save()
+
+            # Retorna a resposta positiva para o front-end disparar o SweetAlert2
+            return JsonResponse({'sucesso': True, 'mensagem': 'Pagamento processado e baixado no MySQL com sucesso!'})
+
+        except Pedido.DoesNotExist:
+            return JsonResponse({'sucesso': False, 'erro': 'Pedido não encontrado no banco de dados.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'sucesso': False, 'erro': f'Erro interno no servidor: {str(e)}'}, status=500)
