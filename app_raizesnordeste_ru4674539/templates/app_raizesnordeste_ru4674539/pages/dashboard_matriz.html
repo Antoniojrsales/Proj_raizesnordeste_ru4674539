@@ -1,0 +1,94 @@
+{% extends 'global/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Temporal - Matriz Raízes do Nordeste{% endblock %}
+
+{% block main-content %}
+<div class="container-fluid py-4">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">📊 Painel Gerencial & Análise Temporal</h2>
+            <p class="text-muted small mb-0">Consolidação e inteligência de dados diários</p>
+        </div>
+        <span class="badge bg-danger fs-6 px-3 py-2">Módulo BI - Realtime</span>
+    </div>
+
+    <hr class="mb-4">
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 bg-white p-4">
+                <span class="text-muted text-uppercase small fw-bold d-block mb-1">Faturamento Total</span>
+                <h2 class="fw-bold text-success mb-0">R$ {{ faturamento_total|floatformat:2 }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 bg-white p-4">
+                <span class="text-muted text-uppercase small fw-bold d-block mb-1">Volume de Vendas</span>
+                <h2 class="fw-bold text-dark mb-0">{{ total_pedidos }} Pedidos</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 bg-white p-4">
+                <span class="text-muted text-uppercase small fw-bold d-block mb-1">Ticket Médio</span>
+                <h2 class="fw-bold text-danger mb-0">R$ {{ ticket_medio|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 rounded-3 bg-white p-4">
+                <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-chart-line text-muted me-2"></i> Evolução de Faturamento Diário</h4>
+                <div style="position: relative; height:300px; width:100%">
+                    <canvas id="chartFaturamentoDiario"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock main-content %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Recupera os dados convertidos do Django ORM com a marcação safe para o JS ler como Array
+    const labelsDias = {{ grafico_labels|safe }};
+    const valoresFaturamento = {{ grafico_valores|safe }};
+
+    // Configuração estrutural do Chart.js
+    const ctx = document.getElementById('chartFaturamentoDiario').getContext('2d');
+    new Chart(ctx, {
+        type: 'line', // Gráfico de linha para demonstrar a evolução do tempo
+        data: {
+            labels: labelsDias, // Eixo X: Dias (ex: 08/06, 09/06...)
+            datasets: [{
+                label: 'Faturamento por Dia (R$)',
+                data: valoresFaturamento, // Eixo Y: Dinheiro acumulado no dia
+                borderColor: '#2b5c8f', // Linha Vermelha (Identidade da Raízes do Nordeste)
+                backgroundColor: 'rgba(43, 92, 143, 0.05)', // Sombra vermelha translúcida abaixo da linha
+                borderWidth: 3,
+                tension: 0.3, // Deixa a linha curvada de forma elegante
+                fill: true,
+                pointBackgroundColor: '#2b5c8f',
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) { return 'R$ ' + value.toFixed(2); } // Formata o eixo Y em dinheiro
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock scripts %}

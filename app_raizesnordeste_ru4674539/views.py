@@ -13,6 +13,9 @@ from django.http import JsonResponse
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.views.generic import TemplateView
+from django.db.models import Sum, Count
+from django.db.models.functions import TruncDate
 
 class HomeView(View):
     def get(self, request):
@@ -186,3 +189,28 @@ class ConfirmarPagamentoView(View):
             return JsonResponse({'sucesso': False, 'erro': 'Pedido não encontrado no banco de dados.'}, status=404)
         except Exception as e:
             return JsonResponse({'sucesso': False, 'erro': f'Erro interno no servidor: {str(e)}'}, status=500)
+        
+class DashboardMatrizView(TemplateView):
+    template_name = 'app_raizesnordeste_ru4674539/pages/dashboard_matriz.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Filtra apenas a massa de pedidos pagos
+        pedidos_pagos = Pedido.objects.filter(status_pagamento='PAGO')
+
+        # --- CARDS PRINCIPAIS ---
+        context['faturamento_total'] = pedidos_pagos.aggregate(total=Sum('valor_total'))['total'] or 0.00
+        context['total_pedidos'] = pedidos_pagos.count()
+        context['ticket_medio'] = context['faturamento_total'] / context['total_pedidos'] if context['total_pedidos'] > 0 else 0.00
+
+        # --- ANÁLISE TEMPORAL DIÁRIA (BI) ---
+        # Agrupa os pedidos truncando a data de criação por dia, somando o faturamento de cada data
+        faturamento_diario = pedidos_pagos.annotate(dia=TruncDate('data_pedido')).values('dia').annotate(
+                                                    total_dia=Sum('valor_total')).order_by('dia')
+
+        # Prepara as listas formatadas em texto/JSON para o JavaScript do gráfico ler sem quebrar
+        context['grafico_labels'] = [dados['dia'].strftime('%d/%m') for dados in faturamento_diario if dados['dia']]
+        context['grafico_valores'] = [float(dados['total_dia']) for dados in faturamento_diario]
+
+        return context

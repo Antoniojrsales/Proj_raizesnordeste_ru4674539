@@ -32,17 +32,55 @@ python -m venv venv
 ### No Linux/Mac para ativar:
 source venv/bin/activate
 
-### 3. Instalar as Dependências:
+### 3. Configurar as Variáveis de Ambiente (`.env`)
+O repositório disponibiliza o arquivo `.env.example` como gabarito de portabilidade. Para inicializar o contexto criptográfico do Django:
+1. Duplique o arquivo `.env.example` na raiz do projeto.
+2. Renomeie a cópia criada para apenas `.env`.
+3. O arquivo já vem pré-configurado com chaves seguras padrões para o ambiente de testes locais em SQLite.
+
+### 4. Instalar as Dependências:
 pip install -r requirements.txt
 
-### 4. Executar as Migrações do Banco de Dados (SQLite):
+### 5. Executar as Migrações do Banco de Dados (SQLite):
 python manage.py migrate
 
-### 5. Carregar a Massa de Dados Inicial
+### 6. Carregar a Massa de Dados Inicial
 python manage.py loaddata dados_iniciais.json
 
-### 5. Iniciar o Servidor de Desenvolvimento:
+### 7. Iniciar o Servidor de Desenvolvimento:
 python manage.py runserver
+
+### 🛠️ Resolução de Problemas de Infraestrutura
+Se durante o processo de deploy na máquina secundária você enfrentar alguma das barreiras de ambiente listadas abaixo, aplique a correção indicada:
+
+🚨 **1. Erro de Inicialização:** CommandError: You must set settings.ALLOWED_HOSTS if DEBUG is False.
+Causa: O Django interceptou que a flag de depuração foi alterada ou o arquivo .env não pôde ser mapeado no diretório atual, bloqueando o tráfego por segurança.
+
+**Solução:** O arquivo settings.py já foi blindado para aceitar requisições de teste em qualquer barramento local configurando a diretiva global ALLOWED_HOSTS = ['*']. Garanta apenas que o arquivo .env esteja de fato na pasta raiz do projeto.
+
+🚨 **2. Erro de Carregamento de Sementes:** UnicodeDecodeError: 'utf-8' codec can't decode...
+Causa: O terminal do Windows em português utiliza a codificação legada Windows-1252 e falha ao interpretar strings com acentuação regional do cardápio (ex: café, pão).
+
+Solução: Antes de executar o comando loaddata, force o terminal do sistema operacional a operar no padrão internacional UTF-8 injetando a variável de ambiente:
+
+No PowerShell: $env:PYTHONUTF8=1
+
+No Prompt de Comando (CMD): set PYTHONUTF8=1
+
+Alternativa: O arquivo dados_iniciais.json contido neste repositório já foi convertido nativamente para UTF-8 Puro para mitigar esse comportamento.
+
+Caso o terminal continue brigando, significa que o arquivo foi salvo com a codificação antiga do Windows quando você fez o export. 
+
+Vamos limpá-lo:
+1.Abra o arquivo dados_iniciais.json no VS Code do novo PC.
+2.Na barra inferior direita do VS Code, clique onde diz a codificação atual (pode estar aparecendo UTF-8 ou Windows-1252).
+3.Selecione a opção "Save with Encoding" (Salvar com Codificação) e escolha UTF-8.
+4.Salve o arquivo (Ctrl + S) e tente rodar o python manage.py loaddata dados_iniciais.json de novo no terminal.
+
+🚨 **3. Intercepção ao Fechar Pedido:** HTTP 403 Forbidden (CSRF cookie not set.)
+Causa: O navegador do novo computador não possui histórico de navegação local, fazendo com que as requisições assíncronas em segundo plano do JavaScript (Fetch API) sejam barradas por ausência do cookie criptográfico.
+
+Solução: O template injeta nativamente o bloco seguro {% csrf_token %} na árvore do DOM. Caso ocorra a intercepção em navegadores limpos, basta atualizar a página inicial do Totem utilizando o comando Ctrl + F5 para forçar o servidor a descarregar e fixar a assinatura de segurança nos cookies locais.
 
 ## 🛠️ Tecnologias Utilizadas
 Este projeto foi construído utilizando as seguintes ferramentas e bibliotecas para garantir robustez e escalabilidade:

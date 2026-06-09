@@ -177,6 +177,30 @@
     }
 },
 {
+    "model": "app_raizesnordeste_ru4674539.pedido",
+    "pk": 5,
+    "fields": {
+        "id_cliente": 1,
+        "id_filial": 2,
+        "canal_venda": "TOTEM",
+        "valor_total": "19.00",
+        "data_pedido": "2026-06-08T21:36:51.996Z",
+        "status_pagamento": "PAGO"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.pedido",
+    "pk": 6,
+    "fields": {
+        "id_cliente": 1,
+        "id_filial": 2,
+        "canal_venda": "TOTEM",
+        "valor_total": "14.00",
+        "data_pedido": "2026-06-09T22:34:31.530Z",
+        "status_pagamento": "PAGO"
+    }
+},
+{
     "model": "app_raizesnordeste_ru4674539.itenspedido",
     "pk": 1,
     "fields": {
@@ -244,6 +268,56 @@
         "id_produto": 3,
         "quantidade": 1,
         "preco_unitario": "2.00"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.itenspedido",
+    "pk": 8,
+    "fields": {
+        "id_pedido": 5,
+        "id_produto": 1,
+        "quantidade": 1,
+        "preco_unitario": "12.00"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.itenspedido",
+    "pk": 9,
+    "fields": {
+        "id_pedido": 5,
+        "id_produto": 3,
+        "quantidade": 1,
+        "preco_unitario": "2.00"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.itenspedido",
+    "pk": 10,
+    "fields": {
+        "id_pedido": 5,
+        "id_produto": 4,
+        "quantidade": 1,
+        "preco_unitario": "5.00"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.itenspedido",
+    "pk": 11,
+    "fields": {
+        "id_pedido": 6,
+        "id_produto": 4,
+        "quantidade": 2,
+        "preco_unitario": "5.00"
+    }
+},
+{
+    "model": "app_raizesnordeste_ru4674539.itenspedido",
+    "pk": 12,
+    "fields": {
+        "id_pedido": 6,
+        "id_produto": 2,
+        "quantidade": 1,
+        "preco_unitario": "4.00"
     }
 }
 ]
